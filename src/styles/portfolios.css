@@ -1,0 +1,15 @@
+.portfolio-card {
+    background: #2A2A3D;
+    border: 1px solid #4CAF50;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 250px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    text-align: left;
+}
+
+.portfolio-card:hover {
+    transform: scale(1.03);
+}

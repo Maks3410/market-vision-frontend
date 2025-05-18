@@ -1,26 +1,58 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import PrivateRoute from './components/PrivateRoute';
+import { logout } from './api/auth';
+import MarketPage from './pages/MarketPage';
+import PortfoliosPage from "./pages/PortfoliosPage";
+import {PortfolioDetailsPage} from "./pages/PortfolioDetalisPage";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+
+const NavigationBar: React.FC = () => {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    return (
+        <nav style={{ padding: '1rem', backgroundColor: '#eee' }}>
+            <Link to="/" style={{ marginRight: '1rem' }}>Состояние рынка</Link>
+            <Link to="/portfolios" style={{ marginRight: '1rem' }}>Мои портфели</Link>
+            <button onClick={handleLogout}>🚪 Выйти</button>
+        </nav>
+    );
+};
+
+const App: React.FC = () => {
+    return (
+        <Router>
+            <NavigationBar />
+            <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route
+                    path="/"
+                    element={
+                        <PrivateRoute>
+                            <MarketPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/portfolios"
+                    element={
+                        <PrivateRoute>
+                            <PortfoliosPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route path="/portfolio/:id" element={<PortfolioDetailsPage />} />
+
+            </Routes>
+        </Router>
+    );
+};
 
 export default App;
