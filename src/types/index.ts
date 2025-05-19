@@ -10,14 +10,14 @@ export interface StockIndex {
     currentPrice: string;
     monthlyDynamic: number;
     currency: Currency;
-    currentUSDPrice: number;
+    currentConvertedPrice: number;
     indexName: string;
     indexISIN: string;
 }
 
 export interface CurrencyRate {
     id: number;
-    currentUSDPrice: number;
+    currentConvertedPrice: number;
     monthlyDynamic: number;
     currency: string;
     symbol: string;

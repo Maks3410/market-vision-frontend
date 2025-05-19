@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/client';
-import { StockIndex, CurrencyRate } from '../types';
+import { StockIndex, CurrencyRate, Currency } from '../types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RefreshCw } from 'lucide-react';
 import '../styles/market.css';
+import '../styles/portfolio-details.css';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MarketPage: React.FC = () => {
@@ -18,10 +19,27 @@ const MarketPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [lastUpdate, setLastUpdate] = useState('Не определено');
+    const [selectedCurrency, setSelectedCurrency] = useState<string>('USD');
+    const [availableCurrencies, setAvailableCurrencies] = useState<string[]>([]);
+    const [conversionCurrency, setConversionCurrency] = useState<Currency | null>(null);
+
+    const fetchAvailableCurrencies = async () => {
+        try {
+            const response = await api.get('/fixings/all-currencies-names');
+            setAvailableCurrencies(response.data);
+        } catch (error) {
+            console.error("Ошибка при загрузке списка валют:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchAvailableCurrencies();
+    }, []);
 
     const buildQueryParams = () => {
         const params: Record<string, string | number> = {
             page: currentPage,
+            currency: selectedCurrency
         };
         if (sortField && sortDirection) {
             params.ordering = `${sortDirection === 'desc' ? '-' : ''}${sortField}`;
@@ -37,11 +55,13 @@ const MarketPage: React.FC = () => {
                 if (activeTab === 'stocks') {
                     const res = await api.get('/fixings/indexes/', { params });
                     setStocks(res.data.results);
+                    setConversionCurrency(res.data.currency);
                     setTotalPages(Math.ceil(res.data.count / res.data.pageSize));
                     setLastUpdate(res.data.lastUpdate);
                 } else {
                     const res = await api.get('/fixings/currencies/', { params });
                     setCurrencies(res.data.results);
+                    setConversionCurrency(res.data.currency);
                     setTotalPages(Math.ceil(res.data.count / res.data.pageSize));
                     setLastUpdate(res.data.lastUpdate);
                 }
@@ -53,7 +73,7 @@ const MarketPage: React.FC = () => {
         };
 
         fetchData();
-    }, [activeTab, sortField, sortDirection, currentPage]);
+    }, [activeTab, sortField, sortDirection, currentPage, selectedCurrency]);
 
     useEffect(() => {
         setSortField(null);
@@ -127,8 +147,8 @@ const MarketPage: React.FC = () => {
                             {activeTab === 'stocks' ? 'ISIN' : 'Тикер'} {sortField === (activeTab === 'stocks' ? 'indexISIN' : 'ticker') ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                         </th>
                         <th>Цена</th>
-                        <th onClick={() => handleSort('currentUSDPrice')}>
-                            Цена в USD {sortField === 'currentUSDPrice' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                        <th onClick={() => handleSort('currentConvertedPrice')}>
+                            Цена в {conversionCurrency?.symbol || selectedCurrency} {sortField === 'currentConvertedPrice' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                         </th>
                         <th onClick={() => handleSort('monthlyDynamic')} style={{ textAlign: 'right' }}>
                             Динамика {sortField === 'monthlyDynamic' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
@@ -150,7 +170,7 @@ const MarketPage: React.FC = () => {
                                 <td>{stock.indexName}</td>
                                 <td>{stock.indexISIN}</td>
                                 <td>{stock.currentPrice} {stock.currency.symbol}</td>
-                                <td>{stock.currentUSDPrice}</td>
+                                <td>{stock.currentConvertedPrice} {conversionCurrency?.symbol}</td>
                                 <td style={{ color: stock.monthlyDynamic >= 0 ? 'green' : 'red', textAlign: 'right' }}>
                                     {stock.monthlyDynamic > 0 ? '+' : ''}
                                     {stock.monthlyDynamic}%
@@ -162,7 +182,7 @@ const MarketPage: React.FC = () => {
                                 <td>{cur.symbol} {cur.currency}</td>
                                 <td>{cur.ticker}</td>
                                 <td>—</td>
-                                <td>{cur.currentUSDPrice}</td>
+                                <td>{cur.currentConvertedPrice} {conversionCurrency?.symbol}</td>
                                 <td style={{ color: cur.monthlyDynamic >= 0 ? 'green' : 'red', textAlign: 'right' }}>
                                     {cur.monthlyDynamic > 0 ? '+' : ''}
                                     {cur.monthlyDynamic}%
@@ -176,7 +196,26 @@ const MarketPage: React.FC = () => {
 
     return (
         <div className="market-page">
+            <div className="portfolio-details-header">
+                <div className="header-top">
             <h1 className="title">Состояние рынка</h1>
+                    <div className="currency-selector">
+                        <label>Валюта конвертации: </label>
+                        <select
+                            value={selectedCurrency}
+                            onChange={(e) => setSelectedCurrency(e.target.value)}
+                            className="currency-select"
+                        >
+                            {availableCurrencies.map((curr) => (
+                                <option key={curr} value={curr}>
+                                    {curr}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div className="tabs">
                 <button
                     className={`tab ${activeTab === 'stocks' ? 'active' : ''}`}

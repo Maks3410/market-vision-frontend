@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { refreshToken } from './auth';
-
-const API_BASE_URL = 'http://localhost:8000/api';
+import { API_BASE_URL } from './config';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -20,7 +19,10 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && 
+            !originalRequest._retry && 
+            !originalRequest.url?.includes('token/refresh')) {
+            
             originalRequest._retry = true;
 
             try {
@@ -28,7 +30,9 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                window.location.href = '/login'; // на случай если refresh тоже невалиден
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
         }
