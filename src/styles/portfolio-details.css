@@ -338,6 +338,12 @@
     align-items: center;
 }
 
+.portfolio-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .currency-selector {
     display: flex;
     align-items: center;
@@ -367,6 +373,30 @@
 .currency-select:focus {
     border-color: #4CAF50;
     outline: none;
+}
+
+.report-button {
+    background: linear-gradient(135deg, #4caf50, #2f855a);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.7rem 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.report-button:hover:not(:disabled) {
+    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.22);
+    transform: translateY(-1px);
+}
+
+.report-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
 }
 
 .delete-button {
@@ -495,6 +525,35 @@
     border-bottom: 1px solid #444;
 }
 
+.socket-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.4rem;
+    color: #9ba6ba;
+    font-size: 0.88rem;
+}
+
+.socket-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.04);
+}
+
+.socket-indicator.online {
+    background: #4caf50;
+}
+
+.socket-indicator.offline {
+    background: #f59e0b;
+}
+
+.socket-status-text {
+    color: #9ba6ba;
+}
+
 .period-selector {
     display: flex;
     align-items: center;
@@ -532,6 +591,13 @@
 
 .prediction-result {
     margin-top: 0.5rem;
+}
+
+.prediction-description p {
+    margin: 0.5rem 0 0;
+    color: #b8bfd2;
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
 .prediction-values {
@@ -599,4 +665,96 @@
 .calculate-button:disabled {
     background: #2A2A3D;
     cursor: not-allowed;
+}
+
+.latest-calculation-card {
+    width: 100%;
+    margin-top: 1rem;
+    background: linear-gradient(135deg, rgba(42, 42, 61, 0.96), rgba(31, 42, 52, 0.96));
+    border: 1px solid #3b4a55;
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    text-align: left;
+    color: #e0e0e0;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.latest-calculation-card.is-clickable {
+    cursor: pointer;
+}
+
+.latest-calculation-card.is-clickable:hover {
+    transform: translateY(-2px);
+    border-color: #4caf50;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.latest-calculation-card.is-empty {
+    opacity: 0.88;
+    cursor: default;
+}
+
+.latest-calculation-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.latest-calculation-copy strong {
+    font-size: 1.05rem;
+    color: #ffffff;
+}
+
+.latest-calculation-meta {
+    color: #9ba6ba;
+    font-size: 0.92rem;
+}
+
+.latest-calculation-live {
+    color: #4caf50;
+}
+
+.latest-calculation-arrow {
+    color: #4caf50;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+    .header-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .portfolio-summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .portfolio-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .summary-card:not(.prediction-card) {
+        height: auto;
+    }
+
+    .prediction-card {
+        min-width: 0;
+    }
+
+    .latest-calculation-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .report-button {
+        width: 100%;
+    }
 }
