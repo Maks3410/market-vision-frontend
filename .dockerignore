@@ -1,0 +1,7 @@
+.git
+.idea
+node_modules
+build
+.env.development
+.env.production
+npm-debug.log
